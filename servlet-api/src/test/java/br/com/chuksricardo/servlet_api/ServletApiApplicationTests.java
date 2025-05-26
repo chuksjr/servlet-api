@@ -1,13 +1,35 @@
 package br.com.chuksricardo.servlet_api;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ServletApiApplicationTests {
+	@Autowired
+	TestRestTemplate restTemplate;
 
 	@Test
-	void contextLoads() {
+	void test() {
+		User user = new User(null, "user", "1234", "user@email.com");
+		User postResponse = restTemplate.postForObject("/users", user, User.class);
+	
+		assertNotNull(postResponse.id());
+		assertEquals(user.username(), postResponse.username());
+		assertEquals(user.email(), postResponse.email());
+		assertEquals(user.password(), postResponse.password());
+
+		User[] getResponses = restTemplate.getForObject("/users", User[].class);
+		User getResponse = getResponses[0];
+
+		assertNotNull(getResponse.id());
+		assertEquals(user.username(), getResponse.username());
+		assertEquals(user.email(), getResponse.email());
+		assertEquals(user.password(), getResponse.password());
+	
 	}
 
 }
